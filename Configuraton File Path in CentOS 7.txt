@@ -1,0 +1,48 @@
+1. Apache HTTP (80):
+
+	/etc/httpd/conf/httpd.conf
+
+2. PHP
+	/etc/php.ini			---Initialization file
+	/etc/httpd/conf.d/php.conf
+
+3. MySQL / MariaDB (3306):
+	/etc/my.cnf
+
+
+
+4. Zabbix (10051 or 10050):
+
+	a. Zabbix Server configuration files (10051):
+	To use the Apache with the Zabbix server, ned to modify zabbix server configuration file
+	/etc/httpd/conf.d/zabbix.conf
+	
+	/etc/zabbix/zabbix_server.conf
+
+	b. Zabbix client (Agent) configuration file (10050):
+	/etc/zabbix/zbbix_agentd.conf
+
+5. Firewall:
+	/etc/firewalld/firewalld.conf
+
+6. Selinux
+	vi /etc/selinux/config 		
+	or
+	vi /etc/sysconfig/selinux
+
+7. Samba (137-139 or 445)
+	/etc/samba/smb.conf
+
+8. NFS (2049, UDP)
+	/etc/exports		# NFS doesnot have configuration file.
+
+9. VSFTP (20-21, TCP)
+	/etc/vsftpd/vsftpd.conf
+
+	Default path: /var/ftp	# Clients fetch data from that path
+
+10. SSH (22)
+
+
+11. DHCP (67-68, BOOTP)
+	/etc/dchp/dhcpd.conf	

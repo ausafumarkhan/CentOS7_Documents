@@ -1,0 +1,114 @@
+-------------------------Logical Volume Manager (LVM) Creation, Extension and Reduction---------------------------------
+
+(a) LVM creation
+
+Step 1: Add HDD of 500 MB, discover the HDD uing 'echo command', create a partition and change ID to '8e' using fdisk tool
+
+
+Step 2: Create a Physical Volume
+
+	pvcreate /ddev/sdc1
+	
+	check PV using: pvs or pvdisplay 
+
+
+Step 3: Create a Volume Group
+
+	vgcreate myvol /dev/sdc1
+
+	Check VG using: vgs or vgdisplay
+
+Step 4: Create a Logical volume
+	
+	lvcreate -L 100M -n lv1 myvol
+
+	Check using: lvs or lvdisplay
+
+Step 5: Format the LVM in ext4 or xfs filesystem type (Note: You cant reduce xfs based LVM)
+
+	mkfs.ext4 /dev/myvol/lv1
+
+Step 6: Create a directory and mount it on /dev/myvol/lv1
+
+	mkdir /lvm
+	mount /dev/myvol/lv1 /lvm
+
+
+Step 7: Create an entry in /etc/fstab file as
+	
+	/dev/myvol/lv1	/lvm	ext4	defaults 	0  0
+	
+
+---------------------Congratulations.... We have Successfully created LVM in CentOS 7----------------
+
+b. Extension of LVM
+
+Step 1: Check the available size in volume group (vg) to extend LVM
+
+	vgs or vgdisplay
+
+Step 2: If vg is available like in above case 100 MB is free
+
+	lvextend -L 100M /dev/myvol/lv1
+	resize2fs /dev/myvol/lv1
+
+	OR
+
+	lvextend -l +100%free /dev/myvol/lv1
+	resize2fs /dev/myvol/lv1
+
+---------------------Congratulations.... We have Successfully extended LVM in CentOS 7----------------
+
+c. Reduce LVM
+
+Step 1: Unmount the partition
+
+	umount /dev/myvol/lv1
+
+Step 2: Check for Bad Blocks
+
+	e2fsck -f /dev/myvol/lv1
+
+Step 3: Resize the filesystem (100 MB is the size you want to retain)
+	
+	resize2fs /dev/myvol/lv1 100M
+
+Step 4: Reduce the LVM to 100 MB
+
+	lvreduce -L 100M /dev/myvol/lv1
+
+Step 5: Mount the partition 
+
+	mount /dev/myvol/lv1 /lvm
+
+---------------------Congratulations.... We have Successfully reduced LVM in CentOS 7----------------
+
+d. Extension of LVM, if vgs is full
+
+Step 1: Add the new HDD, Discover it and create a partition or extend PV directly
+
+
+Step 2: Create a Physical Volume (pv)
+
+	pvcreate /dev/sdd
+
+Step 3: Extend the Volume Group (vg)
+
+	vgextend myvol /dev/sdd
+
+Step 4: Extend the Logical Volume (lv)
+
+	lvextend -l +100%free /dev/myvol/lv1
+	resize2fs /dev/myvol/lv1 
+
+	vgs or vgdisplay
+
+---------------------Congratulations.... We have Successfully extend LVM with new PV in CentOS 7----------------
+
+e. Creation of LVM using PE (Phyiscal Extent)
+
+	pvcreate /dev/sdf1
+	
+	vgcreate -s 8M myvol /dev/sdf1		-- PE size == 8 MB
+
+	lvcreate -l 100 -n lv1 myvol	-- PE Count =100

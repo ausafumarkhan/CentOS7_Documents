@@ -1,0 +1,61 @@
+############################ FTP Configuration in CentOS 7 ##########################
+
+FTP Server
+1. Check the VSFTP is installed or not
+
+	rpm -qa|grep -i vsftp
+
+2. If not, install it but before the package for it
+
+	yum seacrh vsftpd
+
+	yum install -y vsftp.* 
+
+3. Start and Enable the vsftp service
+
+	systemctl start vsftpd
+	systemctl enable vsftpd
+	
+4. Check the status of the port
+
+	netstat -tulpn | grep -i 21
+
+6. Default directory from where clients fetch data
+
+	ls /var/ftp/
+
+7 Find the ip address of the server
+
+	ip r l
+OR
+	ifconfig
+
+FTP Client (Choose any machine)
+
+1. Ping the server from client
+
+	ping <server_ip>
+
+2. Open brower 
+
+	ftp://<server_ip>
+	
+	if, getting error, stop the firewall at the server side using
+	
+	systemctl stop firewalld
+
+3. To do changes, edit onfiguration file at server side
+
+	vi /etc/vsftpd/vsftpd.conf
+
+
+Note: Always try to use hostname instead of server's IP address.
+
+################## Congratulations......!!!!!! We have successfully configured FTP service in centOS 7 ############
+
+To configure FTP for local user with username & password, edit /etc/vsftpd/vsftpd.conf file and disable anonymous login
+	anonymous_enable=NO
+save and restart vsftpd service.
+
+Refresh client browser, enter credentials of local user, you can see the files availble in home directory of the local user
+/home/tom  

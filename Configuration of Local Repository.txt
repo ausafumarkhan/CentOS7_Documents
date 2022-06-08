@@ -1,0 +1,80 @@
+-------------------------- LOCAL REPOSITORY IN CENTOS 7---------------------
+
+STEP 1: Add HDD of 5 GB and Create Partition
+
+	VM ---> Setting --> Hard Disk ---> Add --> 5 GB HDD   Do all the steps
+	
+	Discover the HDD using "echo command"
+	echo "- - -" > /sys/class/scsi_host/host0/scan
+	echo "- - -" > /sys/class/scsi_host/host1/scan
+	echo "- - -" > /sys/class/scsi_host/host2/scan
+
+	Check the disocover HDD using command
+	ls /dev/sd*
+
+	Create a directory to store packages form CD-ROM
+	mkdir /data	
+
+	Create a partition using fdisk tool, then partition table using partprobe and format it in xfs filesystem
+	fdisk /dev/sdb
+	partprobe -s /dev/sdb
+	mkfs.xfs /dev/sdb1
+
+	Entry in fstab
+	vi /etc/fstab
+	/dev/sdb1	/data	xfs	defaults	0 0
+	mount -a
+	df -Th
+
+STEP 2: Copy the Packages form CD-ROM to /data directory
+	
+	rsync -parv /run/media/root/CentOS\ 7\ x86_64/Packages /data/
+
+
+STEP 3: Create a repo using
+	
+	createrepo -v /data/Packages/
+
+STEP 4: Move other repository to /tmp/ 
+
+	mv /etc/yum.repos.d/*.repo /tmp/
+
+STEP 5: Create a file in /etc/yum.repo.d/
+
+	vi /etc/yum.repos.d/local.repo
+
+	Write the following lines:
+	
+	[Local]
+	name=local
+	baseurl=file://data/Packages/
+	enabled=1
+	gpgcheck=0
+
+	Save the file
+
+STEP 6: Clean the cache & other metadata and Check the yum repository
+
+	yum clean all
+	yum repolist
+
+STEP 7: Install the package
+
+	Check the package is installed or not using 
+
+	rpm -qa|grep -i ypbind
+	
+	If it is not install it using local repository
+	
+	yum install -y ypbind
+
+	We can check the Installed package using the following command
+	rpm -qa|grep -i ypbind
+
+STEP 8: Restore the other repository from /tmp/ directory
+
+	mv /tmp/*.repo /etc/yum.repos.d/
+	
+	yum repolist		---You can see the other repositories
+
+-----------------Congratulations, You have configured the local repository and installed the ypbid package successfully---------

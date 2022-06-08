@@ -1,0 +1,49 @@
+                       ##### LAMP Stack Installation IN CENTOS 7 #####################
+
+Step 1: yum install Apache
+
+	yum install httpd
+
+	systemctl start httpd
+	systemctl enable httpd
+	systemctl status httpd
+
+	Open the brower:
+		http://<server_ip_address> or http://127.0.0.1 or http://<hostname -f>
+
+Step 2 Installation of MariaDB
+	
+	yum install mariadb mariadb-server
+
+	systemctl start mariadb
+	systemctl enable mariadb
+	systemctl status mariadb
+	
+	mysql_secure_installation
+
+	mysql -u root -p
+
+	Provide the password of mysql root user
+
+Step 3: Installation of PHP
+
+	yum install php php-mysql php-gd
+	
+	systemctl restart httpd		
+
+Step 4: Configuration of MyAdminPHP
+	
+	vi /var/www/html/info.php
+	
+	write the line:
+			<?php phpinfo()?>
+
+Step 5: If you are running a firewall, run the following commands to allow HTTP and HTTPS services
+
+	firewall-cmd --permanent --zone=public --add-service=http
+	firewall-cmd --permanent --zone=public --add-service=https
+	firewall-cmd --reload
+
+Congratulations! we have installed the LAMP stack succeefully. 
+
+ 

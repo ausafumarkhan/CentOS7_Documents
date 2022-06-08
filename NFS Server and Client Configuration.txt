@@ -1,0 +1,100 @@
+############################ NFS Configuration in CentOS 7 ##########################
+
+NFS Server
+1. Check the NFS is installed or not
+
+	rpm -qa | grep -i nfs
+
+2. If not, install it
+
+	yum install nfs-* -y
+
+3. Start or Restart the services
+
+	systemctl start rpcbind
+	systemctl start nfs
+	
+4. Enable the service on booting
+
+	systemctl enable rpcbind
+	systemctl enable nfs
+
+5. Check the status of the port
+
+	netstat -tulpn | grep -i 2049
+
+6. Edit the major file of NFS
+
+	vi /etc/exports
+   Add the NFS directory that to be shared:
+	/opt/funny	*(sync)
+
+7. Excutes the following commands
+
+	exportfs -rv
+	exportfs -v
+
+8. Find the IP address of the server
+
+	ip r l
+
+
+NFS Client
+
+1. Ping the server from client
+
+	ping <server_ip>
+
+2. Check the connections from client to server via nfs port
+
+	telnet <server_ip> 2049
+	
+	if, getting error, stop the firewall at the server side using
+	
+	systemctl stop firewalld
+
+3. To check server's shared folder
+
+	showmount -e <server_ip>
+
+4. Create the folder at the cleint to mount server's shared folder
+
+	mkdir <client_folder>
+
+	mount <server_ip>:<server's folder path> <client's folder>
+
+5. Persist the mount in /etc/fstab
+
+	<server_ip>:<server's folder path> <client's folder> nfs defaults 0 0 
+
+6. Check the files at the client 
+
+	ls <cleint's folder>
+
+
+Note: Always try to use hostname instead of server's IP address.
+
+################## Congratulations......!!!!!! We have successfully configured NFS service in centOS 7 ############
+
+
+NFS Options
+Some other options we can use in “/etc/exports” file for file sharing is as follows.
+
+ro: With the help of this option we can provide read only access to the shared files i.e client will only be able to read.
+rw: This option allows the client server to both read and write access within the shared directory.
+sync: Sync confirms requests to the shared directory only once the changes have been committed.
+no_subtree_check: This option prevents the subtree checking. When a shared directory is the subdirectory of a larger file system, nfs performs scans of every directory above it, in order to verify its permissions and details. Disabling the subtree check may increase the reliability of NFS, but reduce security.
+no_root_squash: This phrase allows root to connect to the designated directory.
+For more options with “/etc/exports“, you are recommended to read the man pages for export.
+
+
+Important commands for NFS
+Some more important commands for NFS.
+
+showmount -e : Shows the available shares on your local machine
+showmount -e <server-ip or hostname>: Lists the available shares at the remote server
+showmount -d : Lists all the sub directories
+exportfs -v : Displays a list of shares files and options on a server
+exportfs -a : Exports all shares listed in /etc/exports, or given name
+exportfs -u : Unexports all shares listed in /etc/exports, or given name
+exportfs -r : Refresh the server’s list after modifying /etc/exports

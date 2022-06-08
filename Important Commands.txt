@@ -1,0 +1,93 @@
+########################## IMPORTANT COMMAND #######################
+
+1. To display or change the hostname, Fully Qualified Domain Name (FQDN)
+hostname 		# Gives hostname,  we can use: uname -n 
+hostname -s		# Gives short hostname
+hostname -f  		# Gives Fully Qualified domain name
+
+hostnamectl 		# Gives details about hostname
+hostnamectl set-hostname <new_hostname>		# Sets new hostname
+
+
+2. To find Process Name or PID
+
+pidof <process_name>		# Gives pid from process name
+ps -p <pid> -o comm=		# Gives Process Name using PID. -p is used select process by pid and -o is used to enable the format
+ps aux				# Shows process running with PID
+ls /proc | less
+top
+
+3. To UP/DOWN/Modify the connection using nmcli
+
+nmcli con show
+nmcli dev status
+nmcli con up <Name>
+nmcli con down <Name>
+
+4. To check the firewall rule of particular service
+
+nmap -p <port_number> <Server_IP_address>	# Help to find the status of firewall for particular service on server
+
+5. To configure Firewall
+
+firewall-cmd --list-all				# Gives detail all open port
+firewall-cmd --zone=public --permanent --add-port=<port_number>/tcp
+firewall-cmd --zone=public --permanent --add-service=<service_name>
+
+6. To disable SeLinux
+	
+	sestatus			# To check the status of SeLinux
+	
+	echo 0 > /selinux/enforce	# To disbale temporary
+	or
+	setenforce 0
+	or
+	setenforce permissive
+	
+	vi /etc/selinux/config 		# To disable permanently edit in any of the file
+	or
+	vi /etc/sysconfig/selinux
+
+7. ulimit command
+	The ulimit Linux command sets or displays user process resource limits. 
+	Typically, limits are defined in /etc/security/limits.conf file or systemd units.
+
+8. rpm -qf <file_name> 
+
+	or rpm -q --whatprovides /etc/hosts
+
+	rpm -qf /etc/passwd
+	To find package of a file 
+
+9. To know the details about user
+
+	finger <username>
+
+	chfn <username>
+	
+	getent passwd <username>	## This will retrive user's information from /etc/passwd file
+
+10. To disable all users, create a file 
+
+	touch /etc/nologin
+
+11. To change user's password properties like expiry or length, we need to edit and change in the file
+
+	/etc/login.defs
+
+    To change user's passowrd properties like complexity and Re-use, need to do changes in
+
+	/etc/pam.d/system-auth
+	
+	Comment the line 
+	password    requisite     pam_pwquality.so try_first_pass local_users_only retry=3 authtok_type=
+	and replace with
+	password    requisite     pam_pwquality.so try_first_pass local_users_only retry=3 authtok_type= minlen=8 lcredit=-1 ucredit=-1 dcredit=-1 ocredit=-1 enforce_for_root
+
+	if above line doesnt work, then try this
+	
+
+	You can also achieve the same by using the authconfig command line utility as shown below;
+	authconfig --enablereqlower --enablerequpper --enablereqdigit --enablereqother --passminlen=8 --passmaxrepeat=3 --update
+	
+

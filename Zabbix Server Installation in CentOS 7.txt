@@ -1,0 +1,97 @@
+------------------------------- ZABBIX SERVER INSTALLATION IN CENTOS 7 ------------------------------
+
+Step 1: Disable Selinux
+
+To check status of selinux use: sestatus
+To stop selinux temporary use: setenforce 0
+To disbale selinux edit the file: vi /etc/selinux/config --> disabled
+Need to reboot the server, use: reboot now
+
+Step 2: Install PHP
+
+yum -y install epel-release
+yum -y install php
+yum -y install php-cli php-common php-devel php-pear php-gd php-mbstring php-mysql php-xml
+
+Step 3: Enable optional repository on RHEL 7 and install zabbix
+
+yum-config-manager --enable rhel-7-server-optional-rpms
+rpm -ivh https://repo.zabbix.com/zabbix/4.4/rhel/7/x86_64/zabbix-release-4.4-1.el7.noarch.rpm
+
+The following commands to install zabbix server and agent with the MySQL database support package on your system
+yum -y install mariadb-server
+yum install -y zabbix-server-mysql zabbix-web-mysql
+
+Step 4: To begin using the Apache with the Zabbix server. Zabbix configuration file needs to be updated with Timezone
+
+vi /etc/httpd/conf.d/zabbix.conf
+
+Update the below line with TimeZone
+php_value date.timezone Asia/Kolkata
+
+Step 5: Create Zabbix Database
+
+systemctl start mariadb
+systemctl enable mariadb
+mysql_secure_installation
+
+Step 6: Login to mariadb and create the database and user for our zabbix installation. Create the zabbix database as folows:
+
+		DBName=zabbixdb
+		DBUser=zabbixuser
+		DBPassword= Redh@t123
+To login into Mariadb, type : mysql -u root -p and give root password of mysql (mariadb)
+
+create database zabbixdb character set utf8 collate utf8_bin;
+grant all privileges on zabbixdb.* to zabbixuser@localhost identified by 'Redh@t123';
+flush privileges;
+
+Once you are don with cration of database for zabbix installation, then import initail schema and data to the newly cretated 
+database:
+cd /usr/share/doc/zabbix-server-mysql-4.4.10/
+zcat create.sql.gz |mysql -u zabbixuser -p zabbixdb
+
+provide password of zabbix user: Redh@t123
+
+Step 7: update the database configuration file zabbix_server.conf to set the database details:
+
+vi /etc/zabbix/zabbix_server.conf
+
+Verify the following setting and set the correct values:
+		DBHost=localhost
+		DBName=zabbixdb
+		DBUser=zabbixuser
+		DBPassword=Redh@t123
+
+Step 8: As the configurtion has changed, restart or start all the services:
+systemctl restart/start httpd.service
+systemctl restart/start mariadb.service
+systemctl restart/start zabbix-server.service
+
+Step 9: To enable the services to start automattically on server reboot
+systemctl enable httpd.service
+systemctl enable mariadb.service
+systemctl enable zabbix-server.service
+
+Step 10: Configure Firewall
+firewall-cmd --permanent --add-port=10051/tcp
+firewall-cmd --permanent --add-port=80/tcp
+firewall-cmd --reload
+systemctl restart firewalld
+
+Step 11:Finf the IP address
+use command: ip r or ifconfig
+copy ens33 src ip address
+
+Step 12: Installtion of Zabbix FrontEnd
+
+Open brower on Host machine (Windows machine) and type: http://<src ip>/zabbix and press Enter 
+Follow the steps
+
+Congratulations! You have successfully installed Zabbix frontend.
+
+Sign-in page appears
+Username:Admin		(default)
+Password: zabbix 	(default)
+
+Note: It is necessary to disable selinux for starting zabbix-server, otherwise errors occur.

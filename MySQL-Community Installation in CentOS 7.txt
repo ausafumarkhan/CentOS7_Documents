@@ -1,0 +1,41 @@
+                       ##### MySQL Community Server Installation in CENTOS 7 #####################
+
+Step 1: Download MySQL community repository
+
+	wget http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm
+
+Step 2:Install MySQL repository
+
+	rpm -ivh mysql-community-release-el7-5.noarch.rpm
+
+Step 3: Install MySQL using YUM
+ 	
+	yum repolist
+	yum install mysql-server
+
+Step 4: Start, Enable and Check Status MySQL service
+	
+	systemctl start mysqld.service
+	systemctl enable mysqld.service
+	systemctl status mysqld.service
+
+Step 5: Perform the Basic MySQL Hardening
+
+	mysql_secure_installation
+
+Step 6: Login to MySQL
+
+	mysql -u root -p
+
+	Enter the root password for MySQL as you entered in Step 5
+
+Step 7: Welcome to MySQL
+
+	show databases;		--This will show you available databases in MySQL
+
+	use <database_name>;	--This will select the database for further operations
+
+
+Thank you
+
+ 

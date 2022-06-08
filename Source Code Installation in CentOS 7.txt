@@ -1,0 +1,141 @@
+################# SOURCE CODE INSTALLATION IN CENTOS 7 ############################################
+
+Using Source code Installation There were Six steps have to follow.
+
+1. Download 
+            Download the required packages and source code from repositories
+2. Extract
+           Extract the source code using tar and zip command
+3. Configure
+           Configure the apache using ./configure --prefix=PREFIX
+           PREFIX must be replaced with the filesystem path under which the server should be installed. If PREFIX is not specified, it defaults to /usr/local/apache2
+4. Compile and install:
+            Make and make install cmd use to compile and install apache
+5. Customize:
+             vim /etc/systemd/system/httpd.service
+6. Test:
+            To check httpd running or not using commands if working then check in browser.
+
+
+
+Installation process:
+
+1. Run the below command which is used to install all the required packages for the  source code compilation of apache
+       
+      	# yum groupinstall " Development Tools"  -y
+
+	Where "y" is the option for yes to install packages continue in installation. Using y option it cannot ask yes or no
+
+2: install pcre and pcre-devel packages it is also required for the apache installation
+
+	PCRE-Perl Compatible Regular Expressions
+
+	# yum install expat-devel pcre pcre-devel openssl-devel -y
+
+3: Download the apache source code along with apr and apr-util from apache website or git repository
+
+	Apache httpd - https://github.com/apache/httpd/releases
+
+	Apr - https://github.com/apache/apr/releases
+
+	Apr-util - https://github.com/apache/apr-util/releases
+
+To get an apache source code from the repository using "Wget" command to get the source code 
+
+
+	# wget https://github.com/apache/httpd/archive/2.4.28.tar.gz -O httpd-2.4.28.tar.gz
+
+	# wget https://github.com/apache/apr/archive/1.6.2.tar.gz -O apr-1.6.2.tar.gz
+
+	# wget https://github.com/apache/apr-util/archive/1.6.0.tar.gz -O apr-util-1.6.0.tar.gz
+
+4: Extract the downloaded source code
+
+	# tar -xzf httpd-2.4.28.tar.gz
+	# tar -xzf apr-1.6.2.tar.gz
+	# tar -xzf apr-util-1.6.0.tar.gz
+
+5: We need to place apr,apr-util directory to inside the srclib directory  it is located under HTTPD directory
+
+	# mv apr-1.6.2 httpd-2.4.28/srclib/apr
+	# mv apr-util-1.6.0 httpd-2.4.28/srclib/apr-util
+
+6: change directory to httpd-2.4.28( which version u installed u can go to that directory)
+
+	# cd httpd-2.4.28
+
+
+Compilation of Apache source:
+
+step7: To build a configure script, execute the following buildconf script file as follows.
+
+	# ./buildconf 
+
+Step8: Run the configuration command 
+           We  Can change the default Apache installation directory path
+
+	Here path will be /usr/local/apache2 directory path. 
+
+	# ./configure --enable-ssl --enable-so --with-mpm=event --with-included-apr --prefix=/usr/local/apache2
+
+Step9: Execute the make command to prepare the files for the installation of Apache.
+
+	# make
+
+step10: Execute the make install command to install Apache in it' s appropriate directory.
+
+	# make install
+
+Step 11:Now the Apache is successfully installed on the server from it' s source code. Next, run the httpd -v command to check Apache' s version. An error may appear as shown below.
+
+	# httpd -v
+	bash: httpd: command not found…
+
+step12: To remove that error, create an HTTPD command manually. Create a script file for httpd command under /etc/profile.d/ directory. Enter the following line in the file and save it.
+
+	# vim /etc/profile.d/httpd.sh
+	pathmunge /usr/local/apache2/bin
+
+Step13: The file has been created, now logout from the current session and re-login to reload the profile. Check the Apache version by running the following command
+
+	# httpd -v
+	Server version: Apache/2.4.28 (Unix)
+	Server built:   Oct 13 2017 23:23:07
+
+Step14: Create an init script for managing httpd service. So create a httpd file under /etc/init.d/ directory using vim editor and make the following changes in the file. Save and exit the file.
+
+	# vim /etc/systemd/system/httpd.service
+
+	Unit]
+	Description=The Apache HTTP Server
+	After=network.target
+
+	[Service]
+	Type=forking
+	ExecStart=/usr/local/apache2/bin/apachectl -k start
+	ExecReload=/usr/local/apache2/bin/apachectl -k graceful
+	ExecStop=/usr/local/apache2/bin/apachectl -k graceful-stop
+	PIDFile=/usr/local/apache2/logs/httpd.pid
+	PrivateTmp=true
+
+	[Install]
+	WantedBy=multi-user.target
+
+Step15: reload the system deamon
+
+	# systemctl daemon-reload
+
+Step16: start and enable and checking the status of the apache httpd service 
+
+	# systemctl start httpd
+	# systemctl enable httpd
+	Created symlink from /etc/systemd/system/multi-user.target.wants/httpd.service to /etc/systemd/system/httpd.service.
+	# systemctl status httpd
+
+Step17: switch to browser type the localhost IP now loading the webpage using apache webserver.
+
+	It will show the apache welcome page. 
+
+	Thus we conclude the installation and configuration of Apache from its Source Code on CentOS 7.
+	
+

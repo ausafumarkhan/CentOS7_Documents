@@ -1,0 +1,75 @@
+------------------------KERNEL PATCHING IN RHEL/CENTOS 7 -------------------------------
+
+Step 1: Check kernel version using any of the following command:
+	
+	uname -rs  
+	or
+	hostnamectl| grep -i kernel 
+	or
+	cat /proc/version
+
+Step 2: Upgrading Kernel using YUM
+	
+	yum install -y kernel		# This will update the kernel along with all dependencies to the latest version
+
+Step 3: Upgarding to the specific version
+	
+	yum install kernel-{version}
+
+------------------------OTHER WAY TO PATCHS KERNEL IN CENTOS 7------------------------- 
+
+Step 1 — Update and Upgrade CentOS 7 and install the plugin
+		yum -y update
+		yum -y install yum-plugin-fastestmirror
+
+Step 2 — Checking the Kernel Version
+	
+	We will use CentOS 7.6 with default kernel 3.10. Check your CentOS version with commands below.
+		cat /etc/redhat-release
+		cat /etc/os-release
+		uname -snr
+
+Step 3 — Add ELRepo Repository
+	
+	Before installing the new kernel version, we need to add a new repository — the ELRepo repository.
+	Add ELRepo gpg key to the system.
+	
+	rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+	rpm -Uvh https://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm
+
+	When it’s completed, check all repository enabled on the system, and make sure ELRepo is on the list.
+	yum repolist
+
+Step 4 — Install New CentOS Kernel Version
+	
+	In this step, we will install a new latest kernel from ELRepo repository, kernel version 5.0.11 — the Latest stable version on kernel.org.
+	Install the ELRepo kernel version with the yum command below.
+	
+	yum --enablerepo=elrepo-kernel install kernel-ml
+
+Step 5 — Configure Grub2 on CentOS 7
+
+	At step 4, we’ve already installed a new kernel 5.0.11 to the system. 
+	Now, I will show you how to configure the default kernel version to load when the system is starting.
+
+	Check all available kernel versions in the Grub2 with awk command below.
+		
+		awk -F\' '$1=="menuentry " {print i++ " : " $2}' /etc/grub2.cfg
+
+	You see that we have two kernel versions — 3.10 and 5.0.11.
+	Now we want to configure the default kernel that will run when the system is starting. 
+	We will use kernel 5.0 as our default, so you can use the command below to set it up.
+
+		grub2-set-default 0
+	
+	0 — it’s from the awk command on the top. Kernel 5.0.11 = 0, and Kernel 3.10 = 1. 
+	When you want to back to the old kernel, you can change the value of the grub2-set-default command to 1.
+
+	Next, generate the grub2 config with ‘gurb2-mkconfig’ command, then reboot the server.
+
+		grub2-mkconfig -o /boot/grub2/grub.cfg
+		reboot
+	Login to the server again, and check currently kernel version.
+		uname -snr
+
+DONE….!!!

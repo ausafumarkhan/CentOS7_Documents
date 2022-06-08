@@ -1,0 +1,58 @@
+------------------------How to Extend SWAP memory in CENTOS 7-----------------------------
+
+Note: Check the swap memeory to verify it after expansion 
+
+Step 1: Add HDD 
+ 	
+	VM --> Settings --> Hard Disk --> Add --> Hard Disk --> SCSI ---> Next ..
+
+Step 2: Discover the newly added Hard Disk using "echo command"
+
+	echo "- - -" > /sys/class/scsi_host/host0/scan
+	echo "- - -" > /sys/class/scsi_host/host1/scan
+	echo "- - -" > /sys/class/scsi_host/host2/scan
+
+Step 3: Create a Partition od 200M and Change the ID of a partition to Swap ID
+
+	fdisk /dev/sdc
+	
+		Command (m for help): n   
+		Partition type:
+   		p   primary (0 primary, 0 extended, 4 free)
+   		e   extended
+		Select (default p): p
+		Partition number (1-4, default 1): 1
+		First sector (2048-417791, default 2048): 
+		Using default value 2048
+		Last sector, +sectors or +size{K,M,G} (2048-417791, default 417791): +200M
+		Partition 1 of type Linux and of size 200 MiB is set
+		Command (m for help): l
+		Command (m for help): t
+		Selected partition 1
+		Hex code (type L to list all codes): 82
+		Changed type of partition 'Linux' to 'Linux swap / Solaris'
+
+		Command (m for help): w
+
+Step 4: Create the partition table in the HDD /dev/sdc
+
+	partprobe -s /dev/sdc
+
+Step 5: Format the partition in swap filesystem (vfs)
+	
+	mkswap /dev/sdc1
+
+Step 6: Make an entry in /etc/fstab file as shown below:
+	
+	/dev/sdc1	swap 	swap	defaults	0 0
+
+Step 7: Run the following commands
+
+	swapoff -a
+	swapon -a
+
+Step 8: Check the swap memory using 
+
+	free -m
+
+---------------------------------Congratulaions, We have succefully extended the SWAP Partition in CentOS 7-----------------	

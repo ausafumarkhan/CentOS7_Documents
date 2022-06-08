@@ -1,0 +1,34 @@
+------------------------------- ZABBIX CLEINT CONFIGURATION IN CENTOS 7 ------------------------------
+
+Step 1: Install RPM repository of Zabbix 4.4
+rpm -ivh https://repo.zabbix.com/zabbix/4.4/rhel/7/x86_64/zabbix-release-4.4-1.el7.noarch.rpm
+
+Stp 2: Install Zabbix Agent
+yum -y install zabbix-agent
+
+Step 3: Edit /etc/zabbix/zbbix_agentd.conf file and update the following parameters
+Server= <zabbix_server_ip>
+ServerActive= <zabbix_server_ip>
+Hostnam= <zabbix_server_hostname>
+
+Step 4: Start and Enable the zabbix agent
+systemctl start zabbix-agent.service
+systemctl enable zabbix-agent.service
+
+Step 5: Go to the brower in window machine and give url: http://<zabbix_server_ip>/zabbix  & Press Enter
+Enter credential as: username=Admin and Password=zabbix
+click on Configuration--> Hosts--> Create host
+Give
+Hostname=zabbix-client.example.com
+Visible Name= zabbix-client
+Group= Linux server
+Agent Interface= <zabbix_client_ip>
+
+Click on Template---> Add "Template OS Linux by zabbix agent"
+
+Click on Add
+
+In this way, we can create or add more host 
+
+Step 6: Monitoring Hosts
+click on monitoring---> Graph
